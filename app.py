@@ -28,6 +28,8 @@ from dotenv import load_dotenv
 import azure.search.documents
 print(f"azure search version={azure.search.documents.__version__}")
 
+load_dotenv()
+
 # load Azure AI search settings
 service_endpoint: str = os.environ.get("AI_SEARCH_ENDPOINT")
 service_query_key: str = os.environ.get("AI_SEARCH_QUERY_KEY")
@@ -41,7 +43,6 @@ AZURE_OPENAI_CHATGPT_DEPLOYMENT = os.environ.get(
     "AZURE_OPENAI_CHATGPT_DEPLOYMENT")
 AZURE_OPENAI_EMB_DEPLOYMENT = os.environ.get("AZURE_OPENAI_EMB_DEPLOYMENT")
 
-
 openai_client = AzureOpenAI(
     api_key=AZURE_OPENAI_API_KEY,
     api_version="2024-02-01",
@@ -53,3 +54,15 @@ openai_client = AzureOpenAI(
 # function which create title field and contents field's embeddings
 def generate_embeddings(text, model=AZURE_OPENAI_EMB_DEPLOYMENT):
     return openai_client.embeddings.create(input=[text], model=model).data[0].embedding
+
+
+# create query for Azure AI search
+# Query generation prompt
+query_prompt_template = """
+以下は、日本の世界遺産についてナレッジベースを検索して回答する必要のあるユーザーからの新しい質問です。
+会話と新しい質問に基づいて、検索クエリを作成してください。
+検索クエリには、引用されたファイルや文書の名前（例:info.txtやdoc.pdf）を含めないでください。
+検索クエリには、括弧 []または<<>>内のテキストを含めないでください。
+検索クエリを生成できない場合は、数字 0 だけを返してください。
+"""
+messages = [{'role': 'system', 'content': query_prompt_template}]
