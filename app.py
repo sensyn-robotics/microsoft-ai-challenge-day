@@ -27,9 +27,13 @@ from azure.search.documents.models import (
 import os
 from dotenv import load_dotenv
 import azure.search.documents
-print(f"azure search version={azure.search.documents.__version__}")
+import streamlit as st
 
 try:
+    ###
+    # start streamlit
+    st.title("Yo-Ko-So: Sensyn Guide")
+
     ###
     # load environment variables
     load_dotenv()
