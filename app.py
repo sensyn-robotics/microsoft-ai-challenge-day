@@ -84,3 +84,14 @@ messages.append({'role': 'user', 'content': user_q})
 
 # check messages
 print(messages)
+
+# create search query
+chat_completion: ChatCompletion = openai_client.chat.completions.create(
+    messages=messages,
+    model=AZURE_OPENAI_CHATGPT_DEPLOYMENT,
+    temperature=0.0,
+    max_tokens=100,
+    n=1)
+
+query_text = chat_completion.choices[0].message.content
+print(query_text)
