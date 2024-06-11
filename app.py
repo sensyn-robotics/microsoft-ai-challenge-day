@@ -28,6 +28,8 @@ from dotenv import load_dotenv
 import azure.search.documents
 print(f"azure search version={azure.search.documents.__version__}")
 
+###
+# load environment variables
 load_dotenv()
 
 # load Azure AI search settings
@@ -56,6 +58,7 @@ def generate_embeddings(text, model=AZURE_OPENAI_EMB_DEPLOYMENT):
     return openai_client.embeddings.create(input=[text], model=model).data[0].embedding
 
 
+###
 # create query for Azure AI search
 # Query generation prompt
 query_prompt_template = """
@@ -95,3 +98,6 @@ chat_completion: ChatCompletion = openai_client.chat.completions.create(
 
 query_text = chat_completion.choices[0].message.content
 print(query_text)
+
+###
+# Retrieve
