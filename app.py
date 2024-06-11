@@ -66,3 +66,21 @@ query_prompt_template = """
 検索クエリを生成できない場合は、数字 0 だけを返してください。
 """
 messages = [{'role': 'system', 'content': query_prompt_template}]
+
+# setting Few-shot Samples
+query_prompt_few_shots = [
+    {'role': 'user', 'content': '屋久島の歴史を教えて  '},
+    {'role': 'assistant', 'content': '屋久島　歴史'},
+    {'role': 'user', 'content': '清水寺にはどう行きますか？'},
+    {'role': 'assistant', 'content': '清水寺　行き方'}
+]
+
+for shot in query_prompt_few_shots:
+    messages.append({'role': shot.get('role'), 'content': shot.get('content')})
+
+# User query
+user_q = "屋久島はどこに行く？"
+messages.append({'role': 'user', 'content': user_q})
+
+# check messages
+print(messages)
