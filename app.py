@@ -100,4 +100,23 @@ query_text = chat_completion.choices[0].message.content
 print(query_text)
 
 ###
-# Retrieve
+# Retrieve by hybrid search
+
+
+def nonewlines(s: str) -> str:
+    return s.replace('\n', ' ').replace('\r', ' ').replace('[', '【').replace(']', '】')
+
+
+search_client = SearchClient(
+    service_endpoint, index_name, credential=credential)
+docs = search_client.search(
+    search_text=query_text,
+    filter=None,
+    top=3,
+    vector_queries=[VectorizedQuery(vector=generate_embeddings(
+        query_text), k_nearest_neighbors=10, fields="contentVector")]
+)
+docs.get_answers()
+results = [" SOURCE:" + doc['title'] + ": " +
+           nonewlines(doc['content']) for doc in docs]
+print(results)
