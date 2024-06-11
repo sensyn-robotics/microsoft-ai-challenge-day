@@ -1,6 +1,7 @@
-# This is the base file for RAG based on:
+# This is the RAG implementation based on:
 # ref: https://github.com/shohei1029/book-azureopenai-sample/blob/main/aoai-rag/notebooks/02_RAG_AzureAISearch_PythonSDK.ipynb
 
+from azure.core.exceptions import IncompleteReadError
 from tenacity import retry, wait_random_exponential, stop_after_attempt
 from openai.types.chat import (
     ChatCompletion,
@@ -107,33 +108,55 @@ def nonewlines(s: str) -> str:
     return s.replace('\n', ' ').replace('\r', ' ').replace('[', '【').replace(']', '】')
 
 
-search_client = SearchClient(
-    service_endpoint, index_name, credential=credential)
-docs = search_client.search(
-    search_text=query_text,
-    filter=None,
-    top=3,
-    vector_queries=[VectorizedQuery(vector=generate_embeddings(
-        query_text), k_nearest_neighbors=10, fields="contentVector")]
-)
-docs.get_answers()
-results = [" SOURCE:" + doc['title'] + ": " +
-           nonewlines(doc['content']) for doc in docs]
-print(results)
+try:
+    search_client = SearchClient(
+        service_endpoint, index_name, credential=credential)
+    docs = search_client.search(
+        search_text=query_text,
+        filter=None,
+        top=3,
+        vector_queries=[VectorizedQuery(vector=generate_embeddings(
+            query_text), k_nearest_neighbors=10, fields="contentVector")]
+    )
+    docs.get_answers()
+    results = [" SOURCE:" + doc['title'] + ": " +
+               nonewlines(doc['content']) for doc in docs]
+    print(results)
 
 ###
 # Generate answers
 # System message
-system_message_chat_conversation = """
-あなたは日本の世界遺産に関する観光ガイドです。
-If you cannot guess the answer to a question from the SOURCE, answer "I don't know".
-Answers must be in Japanese.
+    system_message_chat_conversation = """
+    あなたは日本の世界遺産に関する観光ガイドです。
+    If you cannot guess the answer to a question from the SOURCE, answer "I don't know".
+    Answers must be in Japanese.
 
-# Restrictions
-- The SOURCE prefix has a colon and actual information after the filename, and each fact used in the response must include the name of the source.
-- To reference a source, use a square bracket. For example, [info1.txt]. Do not combine sources, but list each source separately. For example, [info1.txt][info2.pdf].
-"""
+    # Restrictions
+    - The SOURCE prefix has a colon and actual information after the filename, and each fact used in the response must include the name of the source.
+    - To reference a source, use a square bracket. For example, [info1.txt]. Do not combine sources, but list each source separately. For example, [info1.txt][info2.pdf].
+    """
 
-messages = [{'role': 'system', 'content': system_message_chat_conversation}]
+    messages = [{'role': 'system', 'content': system_message_chat_conversation}]
 
-# context augmentation
+    # context augmentation
+    # Context from Azure AI Search
+    context = "\n".join(results)
+    messages.append({'role': 'user', 'content': user_q + "\n\n" + context})
+
+    # check messages
+    print(messages)
+
+    # generate answers
+    chat_coroutine = openai_client.chat.completions.create(
+        model=AZURE_OPENAI_CHATGPT_DEPLOYMENT,
+        messages=messages,
+        temperature=0.0,
+        max_tokens=1024,
+        n=1,
+        stream=False
+    )
+
+    print(chat_coroutine.choices[0].message.content)
+
+except IncompleteReadError as e:
+    print(f"An error occurred while making the request: {e}")
