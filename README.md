@@ -10,5 +10,5 @@ poetry install
 - run app
 ```
 poetry shell
-python app.py
+./run_app.sh
 ```
