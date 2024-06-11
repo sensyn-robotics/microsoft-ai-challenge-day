@@ -7,3 +7,8 @@ This is the repository for Microsoft AI challenge day 2nd
 ```
 poetry install
 ```
+- run app
+```
+poetry shell
+python app.py
+```
