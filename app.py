@@ -120,3 +120,20 @@ docs.get_answers()
 results = [" SOURCE:" + doc['title'] + ": " +
            nonewlines(doc['content']) for doc in docs]
 print(results)
+
+###
+# Generate answers
+# System message
+system_message_chat_conversation = """
+あなたは日本の世界遺産に関する観光ガイドです。
+If you cannot guess the answer to a question from the SOURCE, answer "I don't know".
+Answers must be in Japanese.
+
+# Restrictions
+- The SOURCE prefix has a colon and actual information after the filename, and each fact used in the response must include the name of the source.
+- To reference a source, use a square bracket. For example, [info1.txt]. Do not combine sources, but list each source separately. For example, [info1.txt][info2.pdf].
+"""
+
+messages = [{'role': 'system', 'content': system_message_chat_conversation}]
+
+# context augmentation
