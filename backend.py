@@ -27,6 +27,8 @@ from azure.search.documents.models import (
 import os
 from dotenv import load_dotenv
 import azure.search.documents
+from IPython.display import Image, display, Audio, Markdown
+import base64
 
 
 class ChatBot:
@@ -41,17 +43,17 @@ class ChatBot:
         self.credential = AzureKeyCredential(self.service_query_key)
 
         # Azure OpenAI settings
-        AZURE_OPENAI_API_KEY = os.environ.get("AZURE_OPENAI_API_KEY")
-        AZURE_OPENAI_ENDPOINT = os.environ.get("AZURE_OPENAI_ENDPOINT")
-        self.AZURE_OPENAI_CHATGPT_DEPLOYMENT = os.environ.get(
-            "AZURE_OPENAI_CHATGPT_DEPLOYMENT")
-        self.AZURE_OPENAI_EMB_DEPLOYMENT = os.environ.get(
-            "AZURE_OPENAI_EMB_DEPLOYMENT")
+        OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+        OPENAI_ENDPOINT = os.environ.get("OPENAI_ENDPOINT")
+        self.OPENAI_CHATGPT_DEPLOYMENT = os.environ.get(
+            "OPENAI_CHATGPT_DEPLOYMENT")
+        self.OPENAI_EMB_DEPLOYMENT = os.environ.get(
+            "OPENAI_EMB_DEPLOYMENT")
 
         self.openai_client = AzureOpenAI(
-            api_key=AZURE_OPENAI_API_KEY,
+            api_key=OPENAI_API_KEY,
             api_version="2024-02-01",
-            azure_endpoint=AZURE_OPENAI_ENDPOINT
+            azure_endpoint=OPENAI_ENDPOINT
         )
 
         ###
@@ -101,13 +103,18 @@ class ChatBot:
     def nonewlines(self, s: str) -> str:
         return s.replace('\n', ' ').replace('\r', ' ').replace('[', '【').replace(']', '】')
 
-    def respond(self, user_q: str):
+    # Open the image file and encode it as a base64 string
+    def encode_image(self, image_path):
+        with open(image_path, "rb") as image_file:
+            return base64.b64encode(image_file.read()).decode("utf-8")
+
+    def respond(self, user_q: str, image_path=None):
         self.messages.append({'role': 'user', 'content': user_q})
 
         # create search query
         chat_completion: ChatCompletion = self.openai_client.chat.completions.create(
             messages=self.messages,
-            model=self.AZURE_OPENAI_CHATGPT_DEPLOYMENT,
+            model=self.OPENAI_CHATGPT_DEPLOYMENT,
             temperature=0.0,
             max_tokens=100,
             n=1)
@@ -122,7 +129,7 @@ class ChatBot:
             filter=None,
             top=3,
             vector_queries=[VectorizedQuery(vector=self.generate_embeddings(
-                query_text, self.AZURE_OPENAI_EMB_DEPLOYMENT), k_nearest_neighbors=10, fields="contentVector")]
+                query_text, self.OPENAI_EMB_DEPLOYMENT), k_nearest_neighbors=10, fields="contentVector")]
         )
         docs.get_answers()
         reference_results = [" SOURCE:" + doc['title'] + ": " +
@@ -132,8 +139,18 @@ class ChatBot:
         ###
         # Generate answers
         # refresh messages for answer LLM.
-        self.messages = [
-            {'role': 'system', 'content': self.system_message_chat_conversation}]
+        if image_path:
+            base64_image = self.encode_image(image_path)
+            self.messages = [
+                {'role': 'user', 'content': [
+                    {"type": "text", "text": self.system_message_chat_conversation},
+                    {"type": "image_url", "image_url": {
+                        "url": f"data:image/png;base64,{base64_image}"}
+                     }
+                ]}]
+        else:
+            self.messages = [
+                {'role': 'system', 'content': self.system_message_chat_conversation}]
 
         # context augmentation
         # Context from Azure AI Search
@@ -143,7 +160,7 @@ class ChatBot:
 
         # generate answers
         chat_coroutine = self.openai_client.chat.completions.create(
-            model=self.AZURE_OPENAI_CHATGPT_DEPLOYMENT,
+            model=self.OPENAI_CHATGPT_DEPLOYMENT,
             messages=self.messages,
             temperature=0.0,
             max_tokens=1024,
@@ -160,9 +177,12 @@ if __name__ == "__main__":
     try:
         bot = ChatBot()
 
+        IMAGE_PATH = "data/ai_challengeday2/問題/クエリー画像/image1.png"
+        display(Image(IMAGE_PATH))
+
         # User query
-        user_q = "屋久島はどこに行く？"
-        responce = bot.respond(user_q)
+        user_q = "写真を見てどこの寺社か名前を教えてください。"
+        responce = bot.respond(user_q, IMAGE_PATH)
         print(responce)
     except IncompleteReadError as e:
         print(f"An error occurred while making the request: {e}")
