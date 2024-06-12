@@ -98,7 +98,7 @@ class ChatBot:
     def generate_embeddings(self, text, model):
         return self.openai_client.embeddings.create(input=[text], model=model).data[0].embedding
 
-    def nonewlines(s: str) -> str:
+    def nonewlines(self, s: str) -> str:
         return s.replace('\n', ' ').replace('\r', ' ').replace('[', '【').replace(']', '】')
 
     def respond(self, user_q: str):
@@ -126,7 +126,7 @@ class ChatBot:
         )
         docs.get_answers()
         reference_results = [" SOURCE:" + doc['title'] + ": " +
-                             nonewlines(doc['content']) for doc in docs]
+                             self.nonewlines(doc['content']) for doc in docs]
         print(f"reference result={reference_results}")
 
         ###
