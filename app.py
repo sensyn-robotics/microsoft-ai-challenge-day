@@ -27,24 +27,17 @@ for message in st.session_state.messages:
         st.markdown(message["content"])
 
 
-def load_image_from_sidebar(key):
-    with st.sidebar:
-        st.title("Upload Your Images")
-        st.session_state.image = st.file_uploader(
-            label=" ", key=key)
-        print(f"{st.session_state.image}")
-        if st.session_state.image is None:
-            return
-
+with st.sidebar:
+    st.title("Upload Your Images")
+    st.session_state.image = st.file_uploader(
+        label=" ")
+    print(f"{st.session_state.image}")
+    if st.session_state.image is not None:
         image_url_contents = to_base64(st.session_state.image)
 
         # display image
         st.image(image_url_contents, use_column_width=True)
 
-        return image_url_contents
-
-
-image_url_contents = load_image_from_sidebar("key1")
 
 if prompt:
     # add user message
