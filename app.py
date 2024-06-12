@@ -1,7 +1,11 @@
 import streamlit as st
+from backend import ChatBot
 
 st.title("Yo-Ko-So: Sensyn Guide")
 prompt = st.chat_input("Please enter your question")
+
+# prepare bot
+bot = ChatBot()
 
 # init message
 if "messages" not in st.session_state:
@@ -19,7 +23,7 @@ if prompt:
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
-        responce = "こんにちは"
+        responce = bot.respond(prompt)
         st.markdown(responce)
 
     # add assistant message

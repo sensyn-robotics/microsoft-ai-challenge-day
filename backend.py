@@ -141,9 +141,6 @@ class ChatBot:
         self.messages.append(
             {'role': 'user', 'content': user_q + "\n\n" + context})
 
-        # check messages
-        print(self.messages)
-
         # generate answers
         chat_coroutine = self.openai_client.chat.completions.create(
             model=self.AZURE_OPENAI_CHATGPT_DEPLOYMENT,
@@ -161,9 +158,10 @@ class ChatBot:
 
 if __name__ == "__main__":
     try:
+        bot = ChatBot()
+
         # User query
         user_q = "屋久島はどこに行く？"
-        bot = ChatBot()
         responce = bot.respond(user_q)
         print(responce)
     except IncompleteReadError as e:
