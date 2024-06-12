@@ -2,7 +2,6 @@ import streamlit as st
 from backend import ChatBot
 import numpy as np
 from PIL import Image
-
 import base64
 
 
@@ -27,15 +26,24 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# load image
-with st.sidebar:
-    st.title("Upload Your Images")
-    st.session_state.images = st.file_uploader(
-        label=" ", accept_multiple_files=True)
-    # print(f"{[to_base64(img) for img in st.session_state.images]}")
-    print(f"{[img for img in st.session_state.images]}")
+
+def load_image_from_sidebar(key):
+    with st.sidebar:
+        st.title("Upload Your Images")
+        st.session_state.image = st.file_uploader(
+            label=" ", key=key)
+        print(f"{st.session_state.image}")
+        if st.session_state.image is None:
+            return
+
+        image_url_contents = to_base64(st.session_state.image)
+        return image_url_contents
+
+
+load_image_from_sidebar("key1")
 
 if prompt:
+    image_url_contents = load_image_from_sidebar("key2")
     # add user message
     st.session_state.messages.append({"role": "user", "content": prompt})
 
@@ -43,7 +51,7 @@ if prompt:
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
-        responce = bot.respond(prompt)
+        responce = bot.respond(prompt, image_url_contents)
         st.markdown(responce)
 
     # add assistant message
