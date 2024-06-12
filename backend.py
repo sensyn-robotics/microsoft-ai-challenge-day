@@ -27,7 +27,6 @@ from azure.search.documents.models import (
 import os
 from dotenv import load_dotenv
 import azure.search.documents
-from IPython.display import Image, display, Audio, Markdown
 import base64
 
 
@@ -178,7 +177,6 @@ if __name__ == "__main__":
         bot = ChatBot()
 
         IMAGE_PATH = "data/ai_challengeday2/問題/クエリー画像/image1.png"
-        display(Image(IMAGE_PATH))
 
         # User query
         user_q = "写真を見てどこの寺社か名前を教えてください。"

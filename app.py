@@ -1,8 +1,11 @@
 import streamlit as st
 from backend import ChatBot
+import numpy as np
+from PIL import Image
 
 st.title("Yo-Co-So: Sensyn Guide")
-prompt = st.chat_input("Please enter your question")
+prompt = st.chat_input(
+    "Please enter your question. You can also upload an image.")
 
 # prepare bot
 bot = ChatBot()
@@ -14,6 +17,12 @@ if "messages" not in st.session_state:
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
+
+# load image
+with st.sidebar:
+    st.title("Upload Your Images")
+    st.session_state.images = st.file_uploader(
+        label=" ", accept_multiple_files=True)
 
 if prompt:
     # add user message
