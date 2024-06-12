@@ -37,6 +37,8 @@ def load_image_from_sidebar(key):
             return
 
         image_url_contents = to_base64(st.session_state.image)
+        st.image(image_url_contents, use_column_width=True)
+
         return image_url_contents
 
 
@@ -44,6 +46,7 @@ load_image_from_sidebar("key1")
 
 if prompt:
     image_url_contents = load_image_from_sidebar("key2")
+
     # add user message
     st.session_state.messages.append({"role": "user", "content": prompt})
 
