@@ -31,7 +31,7 @@ with st.sidebar:
     st.title("Upload Your Images")
     st.session_state.image = st.file_uploader(
         label=" ")
-    print(f"{st.session_state.image}")
+    print(f"uploaded_file={st.session_state.image}")
     if st.session_state.image is not None:
         image_url_contents = to_base64(st.session_state.image)
 
