@@ -36,9 +36,9 @@ class ChatBot:
 
         # load Azure AI search settings
         self.service_endpoint: str = os.environ.get("AI_SEARCH_ENDPOINT")
-        service_query_key: str = os.environ.get("AI_SEARCH_QUERY_KEY")
+        self.service_query_key: str = os.environ.get("AI_SEARCH_QUERY_KEY")
         self.index_name: str = os.environ.get("INDEX_NAME")
-        self.credential = AzureKeyCredential(service_query_key)
+        self.credential = AzureKeyCredential(self.service_query_key)
 
         # Azure OpenAI settings
         AZURE_OPENAI_API_KEY = os.environ.get("AZURE_OPENAI_API_KEY")
