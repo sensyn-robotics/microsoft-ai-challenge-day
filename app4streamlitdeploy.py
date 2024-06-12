@@ -1,3 +1,6 @@
+import streamlit as st
+
+# copy the ChatBot class from backend.py because streamlit community cloud only support 1 file.
 # This is the RAG implementation based on:
 # ref: https://github.com/shohei1029/book-azureopenai-sample/blob/main/aoai-rag/notebooks/02_RAG_AzureAISearch_PythonSDK.ipynb
 
@@ -156,13 +159,31 @@ class ChatBot:
         return responce
 
 
-if __name__ == "__main__":
-    try:
-        bot = ChatBot()
+st.title("Yo-Co-So: Sensyn Guide")
+prompt = st.chat_input("Please enter your question")
 
-        # User query
-        user_q = "屋久島はどこに行く？"
-        responce = bot.respond(user_q)
-        print(responce)
-    except IncompleteReadError as e:
-        print(f"An error occurred while making the request: {e}")
+# prepare bot
+bot = ChatBot()
+
+# init message
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+if prompt:
+    # add user message
+    st.session_state.messages.append({"role": "user", "content": prompt})
+
+    with st.chat_message("user"):
+        st.markdown(prompt)
+
+    with st.chat_message("assistant"):
+        responce = bot.respond(prompt)
+        st.markdown(responce)
+
+    # add assistant message
+    st.session_state.messages.append(
+        {"role": "assistant", "content": responce})

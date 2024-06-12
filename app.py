@@ -1,7 +1,7 @@
 import streamlit as st
 from backend import ChatBot
 
-st.title("Yo-Ko-So: Sensyn Guide")
+st.title("Yo-Co-So: Sensyn Guide")
 prompt = st.chat_input("Please enter your question")
 
 # prepare bot
