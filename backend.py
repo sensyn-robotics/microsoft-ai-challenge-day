@@ -113,7 +113,7 @@ class ChatBot:
             n=1)
 
         query_text = chat_completion.choices[0].message.content
-        print(query_text)
+        print(f"revised query={query_text}")
 
         ###
         # Retrieve by hybrid search
@@ -127,7 +127,7 @@ class ChatBot:
         docs.get_answers()
         reference_results = [" SOURCE:" + doc['title'] + ": " +
                              nonewlines(doc['content']) for doc in docs]
-        print(reference_results)
+        print(f"reference result={reference_results}")
 
         ###
         # Generate answers
