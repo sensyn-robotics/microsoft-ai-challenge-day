@@ -102,12 +102,7 @@ class ChatBot:
     def nonewlines(self, s: str) -> str:
         return s.replace('\n', ' ').replace('\r', ' ').replace('[', '【').replace(']', '】')
 
-    # Open the image file and encode it as a base64 string
-    def encode_image(self, image_path):
-        with open(image_path, "rb") as image_file:
-            return base64.b64encode(image_file.read()).decode("utf-8")
-
-    def respond(self, user_q: str, image_path=None):
+    def respond(self, user_q: str, image_url_contents=None):
         self.messages.append({'role': 'user', 'content': user_q})
 
         # create search query
@@ -138,13 +133,13 @@ class ChatBot:
         ###
         # Generate answers
         # refresh messages for answer LLM.
-        if image_path:
-            base64_image = self.encode_image(image_path)
+        if image_url_contents is not None:
+
             self.messages = [
                 {'role': 'user', 'content': [
                     {"type": "text", "text": self.system_message_chat_conversation},
                     {"type": "image_url", "image_url": {
-                        "url": f"data:image/png;base64,{base64_image}"}
+                        "url": image_url_contents}
                      }
                 ]}]
         else:
@@ -171,16 +166,25 @@ class ChatBot:
 
         return responce
 
+# Open the image file and encode it as a base64 string
+
+
+def encode_image(image_path):
+    with open(image_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode("utf-8")
+
 
 if __name__ == "__main__":
     try:
         bot = ChatBot()
 
-        IMAGE_PATH = "data/ai_challengeday2/問題/クエリー画像/image1.png"
+        image_path = "data/ai_challengeday2/問題/クエリー画像/image1.png"
+        base64_image = encode_image(image_path)
+        img_url_contents = f"data:image/png;base64,{base64_image}"
 
         # User query
         user_q = "写真を見てどこの寺社か名前を教えてください。"
-        responce = bot.respond(user_q, IMAGE_PATH)
+        responce = bot.respond(user_q, img_url_contents)
         print(responce)
     except IncompleteReadError as e:
         print(f"An error occurred while making the request: {e}")

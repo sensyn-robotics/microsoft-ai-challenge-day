@@ -3,6 +3,15 @@ from backend import ChatBot
 import numpy as np
 from PIL import Image
 
+import base64
+
+
+def to_base64(uploaded_file):
+    file_buffer = uploaded_file.read()
+    b64 = base64.b64encode(file_buffer).decode()
+    return f"data:image/png;base64,{b64}"
+
+
 st.title("Yo-Co-So: Sensyn Guide")
 prompt = st.chat_input(
     "Please enter your question. You can also upload an image.")
@@ -23,6 +32,8 @@ with st.sidebar:
     st.title("Upload Your Images")
     st.session_state.images = st.file_uploader(
         label=" ", accept_multiple_files=True)
+    # print(f"{[to_base64(img) for img in st.session_state.images]}")
+    print(f"{[img for img in st.session_state.images]}")
 
 if prompt:
     # add user message
