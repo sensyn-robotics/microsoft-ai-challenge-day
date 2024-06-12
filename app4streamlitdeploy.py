@@ -159,7 +159,7 @@ class ChatBot:
         return responce
 
 
-st.title("Yo-Ko-So: Sensyn Guide")
+st.title("Yo-Co-So: Sensyn Guide")
 prompt = st.chat_input("Please enter your question")
 
 # prepare bot
