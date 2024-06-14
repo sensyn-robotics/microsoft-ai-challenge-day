@@ -7,11 +7,12 @@ This is the repository for Microsoft AI challenge day 2nd
 - set up vertual environment
 ```
 poetry install
-poetry shell
 ```
+- create your own .env from .env.sample by checking Azure portal
 
 ## run web app
 ```
+poetry shell
 ./run_app.sh
 ```
 
