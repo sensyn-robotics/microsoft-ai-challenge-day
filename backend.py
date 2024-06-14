@@ -178,7 +178,7 @@ if __name__ == "__main__":
     try:
         bot = ChatBot()
 
-        image_path = "data/ai_challengeday2/問題/クエリー画像/image1.png"
+        image_path = "data/image1.png"
         base64_image = encode_image(image_path)
         img_url_contents = f"data:image/png;base64,{base64_image}"
 
